@@ -52,12 +52,12 @@
           [(ngModel)]="register.email"
           class="form-control"
           [ngClass]="{'is-valid': !email.invalid, 'is-invalid': email.invalid}"
-          pattern="^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+          [pattern]="emailPattern"
           required
         />
         <div class="alert alert-danger" *ngIf="email.invalid && (email.dirty || email.touched)">
           <div *ngIf="email.errors.required">Introduzca un email por favor</div>
-          <div *ngIf="email.errors.pattern">Introduzca una email con el formato adecuado por favor. Pj: nombre@gmail.com</div>
+          <div *ngIf="email.errors.pattern">Introduzca un email con el formato adecuado por favor. Pj: nombre@gmail.com</div>
         </div>
 
         <label for="password"><b>Password</b></label>
