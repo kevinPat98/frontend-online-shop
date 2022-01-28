@@ -8,6 +8,7 @@ import { UsersAdminService } from './users-admin.service';
 import { IRegisterForm } from '@core/interfaces/register.interface';
 import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 
 @Component({
   selector: 'app-users',
@@ -21,6 +22,7 @@ export class UsersComponent implements OnInit {
   resultData: IResultData;
   include: boolean;
   columns: Array<ITableColums>;
+  filterActiveValues = ACTIVE_FILTERS.ACTIVE;
   constructor(private service: UsersAdminService) {}
   ngOnInit(): void {
     this.context = {};
@@ -50,6 +52,10 @@ export class UsersComponent implements OnInit {
       {
         property: 'role',
         label: 'Permisos'
+      },
+      {
+        property: 'active',
+        label: '¿Activo?'
       }
     ];
   }
@@ -93,18 +99,21 @@ export class UsersComponent implements OnInit {
           'Datalles',
           `${user.name} ${user.lastname}<br/>
           <i class="fas fa-envelope"></i>&nbsp;&nbsp;${user.email}`,
-          350,
+          (user.active !== false) ? 375 : 400,
           '<i class="fas fa-pencil-alt"></i> Editar', // true
-          '<i class="fas fa-lock"></i> Bloquear'
+          (user.active !== false) ? '<i class="fas fa-lock"></i> Bloquear' : '<i class="fas fa-lock-open"></i> Desbloquear'
         ); // false
         if (result) {
           this.updateForm(html, user);
         } else if (result === false) {
-          this.blockForm(user);
+          this.unblockForm(user, false);
         }
         break;
       case 'block':
-        this.blockForm(user);
+        this.unblockForm(user, false);
+        break;
+      case 'unblock':
+        this.unblockForm(user, true);
         break;
       default:
         break;
@@ -125,6 +134,13 @@ export class UsersComponent implements OnInit {
         console.log(res);
         if (res.status) {
           basicAlert(TYPE_ALERT.SUCCESS, res.message);
+          this.service.sendEmailActive(res.user.id, user.email).subscribe(
+            resEmail => {
+              (resEmail.status) ? 
+              basicAlert(TYPE_ALERT.SUCCESS, resEmail.message) :
+              basicAlert(TYPE_ALERT.WARNING, resEmail.message);
+            }
+          )
           return;
         }
         basicAlert(TYPE_ALERT.WARNING, res.message);
@@ -150,21 +166,30 @@ export class UsersComponent implements OnInit {
       });
     }
   }
-  private async blockForm(user: any) {
-    const result = await optionsWithDetails(
-      '¿Seguro que quiere bloquear?',
-      `Si bloquea el usuario seleccionado, no se mostrará en la lista`,
+  private async unblockForm(user: any, unblock: boolean) {
+    const result = (unblock) ?
+    await optionsWithDetails(
+      '¿Seguro que quiere Desbloquear?',
+      `Si desbloquea el usuario seleccionado, se mostrará en la lista y se podrá realizar compras y ver todos los productos`,
+      460,
+      'No desbloquear',
+      'Si desbloquear'
+    ) :
+    await optionsWithDetails(
+      '¿Seguro que quiere Bloquear?',
+      `Si bloquea el usuario seleccionado, no se mostrará en la lista de activos y no podrá realizar compras ni ver los productos`,
       430,
       'No bloquear',
-      'Si Bloquear'
+      'Si bloquear'
     );
     if (result === false) {
-      // Si el resultado es falso se quiere bloquear
-      this.blockUser(user.id);
+      // Si el resultado es falso se quiere bloquear / desbloquear
+        this.unblockUser(user.id, unblock, true);
+      
     }
   }
-  private blockUser(id: string) {
-    this.service.block(id).subscribe((res: any) => {
+  private unblockUser(id: string, unblock: boolean = false, admin: boolean = false) {
+    this.service.unblock(id, unblock, admin).subscribe((res: any) => {
       console.log(res);
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);

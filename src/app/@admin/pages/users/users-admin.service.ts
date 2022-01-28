@@ -1,3 +1,4 @@
+import { ACTIVE_EMAIL_USER } from './../../../@graphql/operations/mutation/user';
 import { map } from 'rxjs/internal/operators/map';
 import { Apollo } from 'apollo-angular';
 import { UsersService } from '@core/services/users.service';
@@ -31,15 +32,24 @@ export class UsersAdminService extends ApiService{
     }));
   }
 
-  block(id: string){
+  unblock(id: string, unblock: boolean = false, admin: boolean = false){
     return this.set(
       BLOCK_USER,
       {
-        id
+        id,
+        unblock,
+        admin
       }
     ).pipe(map((result: any) => {
         return result.blockUser;
     }));
   }
 
+  sendEmailActive(id: string, email: string){
+    return this.set(
+      ACTIVE_EMAIL_USER, { id,email }
+    ).pipe(map((result: any) => {
+      return result.activeUserEmail;
+    }));
+  }
 }
