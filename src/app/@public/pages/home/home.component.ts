@@ -1,8 +1,11 @@
-import { ApiService } from '@graphql/services/api.service';
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '@core/services/auth.service';
 import { UsersService } from '@core/services/users.service';
-
+import { ICarouselItem } from '@mugan86/ng-shop-ui/lib/interfaces/carousel-item.interface';
+import carouselItems from '@data/carousel.json';
+import productsList from '@data/products.json';
+import { ProductsService } from '@core/services/products.service';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
+import { IProduct } from '@mugan86/ng-shop-ui/lib/interfaces/product.interface';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -10,18 +13,50 @@ import { UsersService } from '@core/services/users.service';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private usersApi: UsersService, private auth: AuthService) { }
+  items: ICarouselItem[] = [];
+  productsList;
+  listOne;
+  listTwo;
+  listThree;
+  constructor(private products: ProductsService) { }
 
   ngOnInit(): void {
-    this.usersApi.getUsers(1, 1).subscribe(result => {
-      console.log(result); // {status message users: []}
-    });
-    /*this.auth.login('kevin.patino01@uptc.edu.co', '1234').subscribe(result => {
-      console.log(result);
-    });
-    this.auth.getMe().subscribe(result => {
-      console.log(result); // {status message user: {}}
-    });*/
-  }
+    this.products.getByLastUnitsOffers(
+      1, 4, ACTIVE_FILTERS.ACTIVE,
+      true, 35).subscribe(result => {
+        console.log('productos a menos de 35', result);
+        this.listTwo = result;
+      });
 
+    this.products.getByPlatform(
+      1, 4, ACTIVE_FILTERS.ACTIVE,
+      true, '18'
+    ).subscribe(result => {
+      console.log('products ps4', result);
+      this.listOne = result;
+    });
+
+    this.products.getByPlatform(
+      1, 4, ACTIVE_FILTERS.ACTIVE,
+      true, '4'
+    ).subscribe(result => {
+      console.log('products pc', result);
+      this.listThree = result;
+    });
+
+    this.products.getByLastUnitsOffers(
+      1, 6, ACTIVE_FILTERS.ACTIVE, true, -1, 20).subscribe( (result: IProduct[]) => {
+        result.map((item: IProduct) => {
+          this.items.push({
+            id: item.id,
+            title: item.name,
+            description: item.description,
+            background: item.img,
+            url: ''
+          });
+        });
+    });
+    // this.items = carouselItems;
+
+  }
 }
