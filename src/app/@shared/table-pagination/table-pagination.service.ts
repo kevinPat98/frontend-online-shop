@@ -1,5 +1,5 @@
-import { ApiService } from '@graphql/services/api.service';
 import { Injectable } from '@angular/core';
+import { ApiService } from '@graphql/services/api.service';
 import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 
@@ -12,7 +12,7 @@ export class TablePaginationService extends ApiService{
     super(apollo);
   }
 
-  getCollectionData(query: DocumentNode, variables: object = {}, context: object = {}){
+  getCollectionData(query: DocumentNode, variables: object = {}, context: object = {}) {
     return this.get(query, variables, context);
   }
 }

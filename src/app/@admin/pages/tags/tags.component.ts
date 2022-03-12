@@ -1,26 +1,27 @@
 import { TAG_LIST_QUERY } from '@graphql/operations/query/tag';
 import { Component, OnInit } from '@angular/core';
-import { ITableColums } from '@core/interfaces/table-columns.interface';
+import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { DocumentNode } from 'graphql';
 import { IResultData } from '@core/interfaces/result-data.interface';
 import { TagsService } from './tags.service';
 import { optionsWithDetails, formBasicDialog } from '@shared/alerts/alerts';
 import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 
 @Component({
   selector: 'app-tags',
   templateUrl: './tags.component.html',
-  styleUrls: ['./tags.component.scss']
+  styleUrls: ['./tags.component.scss'],
 })
 export class TagsComponent implements OnInit {
-
   query: DocumentNode = TAG_LIST_QUERY;
   context: object;
   itemsPage: number;
   resultData: IResultData;
   include: boolean;
-  columns: Array<ITableColums>;
+  columns: Array<ITableColumns>;
+  filterActiveValues = ACTIVE_FILTERS.ALL;
   constructor(private service: TagsService) {}
   ngOnInit(): void {
     this.context = {};
@@ -42,6 +43,10 @@ export class TagsComponent implements OnInit {
       {
         property: 'slug',
         label: 'Slug',
+      },
+      {
+        property: 'active',
+        label: '¿Activo?',
       },
     ];
   }
@@ -66,18 +71,23 @@ export class TagsComponent implements OnInit {
         const result = await optionsWithDetails(
           'Detalles',
           `${tag.name} (${tag.slug})`,
-          375,
+          tag.active !== false ? 375 : 400,
           '<i class="fas fa-edit"></i> Editar', // true
-          '<i class="fas fa-lock"></i> Bloquear'
+          tag.active !== false
+            ? '<i class="fas fa-lock"></i> Bloquear'
+            : '<i class="fas fa-lock-open"></i> Desbloquear'
         ); // false
         if (result) {
           this.updateForm(html, tag);
         } else if (result === false) {
-          this.blockForm(tag);
+          this.unblockForm(tag, tag.active !== false ? false : true);
         }
         break;
       case 'block':
-        this.blockForm(tag);
+        this.unblockForm(tag, false);
+        break;
+      case 'unblock':
+        this.unblockForm(tag, true);
         break;
       default:
         break;
@@ -85,7 +95,6 @@ export class TagsComponent implements OnInit {
   }
   private async addForm(html: string) {
     const result = await formBasicDialog('Añadir tag', html, 'name');
-    console.log(result);
     this.addtag(result);
   }
   private addtag(result) {
@@ -106,10 +115,8 @@ export class TagsComponent implements OnInit {
   }
 
   private updateTag(id: string, result) {
-    console.log(id, result.value);
     if (result.value) {
       this.service.update(id, result.value).subscribe((res: any) => {
-        console.log(res);
         if (res.status) {
           basicAlert(TYPE_ALERT.SUCCESS, res.message);
           return;
@@ -119,9 +126,8 @@ export class TagsComponent implements OnInit {
     }
   }
 
-  private blockTag(id: string) {
-    this.service.block(id).subscribe((res: any) => {
-      console.log(res);
+  private unblockTag(id: string, unblock: boolean) {
+    this.service.unblock(id, unblock).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
         return;
@@ -130,18 +136,25 @@ export class TagsComponent implements OnInit {
     });
   }
 
-  private async blockForm(tag: any) {
-    const result = await optionsWithDetails(
-      '¿Bloquear?',
-      `Si bloqueas el item seleccionado, no se mostrará en la lista`,
-      430,
-      'No, no bloquear',
-      'Si, bloquear'
-    );
+  private async unblockForm(tag: any, unblock: boolean) {
+    const result = unblock
+      ? await optionsWithDetails(
+          '¿Desbloquear?',
+          `Si desbloqueas el tag seleccionado, se mostrará en la lista y podrás hacer compras y ver toda la información`,
+          500,
+          'No, no desbloquear',
+          'Si, desbloquear'
+        )
+      : await optionsWithDetails(
+          '¿Bloquear?',
+          `Si bloqueas el tag seleccionado, no se mostrará en la lista`,
+          430,
+          'No, no bloquear',
+          'Si, bloquear'
+        );
     if (result === false) {
-      // Si resultado falso, queremos bloquear
-      this.blockTag(tag.id);
+      // Si resultado falso, queremos bloquear / desbloquear
+      this.unblockTag(tag.id, unblock);
     }
   }
-
 }

@@ -5,7 +5,7 @@ export interface IInfoPage {
     total: number;
 }
 
-export interface IResultData{
+export interface IResultData {
     listKey: string;
     definitionKey: string;
 }

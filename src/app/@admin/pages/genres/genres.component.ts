@@ -1,10 +1,11 @@
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 import { basicAlert } from '@shared/alerts/toasts';
-import { Component, OnInit } from '@angular/core';
-import { IResultData } from '@core/interfaces/result-data.interface';
-import { ITableColums } from '@core/interfaces/table-columns.interface';
 import { GENRE_LIST_QUERY } from '@graphql/operations/query/genre';
-import { formBasicDialog, optionsWithDetails } from '@shared/alerts/alerts';
+import { Component, OnInit } from '@angular/core';
 import { DocumentNode } from 'graphql';
+import { IResultData } from '@core/interfaces/result-data.interface';
+import { ITableColumns } from '@core/interfaces/table-columns.interface';
+import { formBasicDialog, optionsWithDetails } from '@shared/alerts/alerts';
 import { GenresService } from './genres.service';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 
@@ -19,7 +20,8 @@ export class GenresComponent implements OnInit {
   itemsPage: number;
   resultData: IResultData;
   include: boolean;
-  columns: Array<ITableColums>;
+  columns: Array<ITableColumns>;
+  filterActiveValues = ACTIVE_FILTERS.ALL;
   constructor(private service: GenresService) {}
   ngOnInit(): void {
     this.context = {};
@@ -42,14 +44,18 @@ export class GenresComponent implements OnInit {
         property: 'slug',
         label: 'Slug',
       },
+      {
+        property: 'active',
+        label: '¿Activo?',
+      },
     ];
   }
 
   async takeAction($event) {
-    // Información para las acciones
+    // Coger la información para las acciones
     const action = $event[0];
     const genre = $event[1];
-    // Valor por defecto
+    // Cogemos el valor por defecto
     const defaultValue =
       genre.name !== undefined && genre.name !== '' ? genre.name : '';
     const html = `<input id="name" value="${defaultValue}" class="swal2-input" required>`;
@@ -64,33 +70,37 @@ export class GenresComponent implements OnInit {
         break;
       case 'info':
         const result = await optionsWithDetails(
-          'Datalles',
+          'Detalles',
           `${genre.name} (${genre.slug})`,
-          350,
-          '<i class="fas fa-pencil-alt"></i> Editar', // true
-          '<i class="fas fa-lock"></i> Bloquear'
-        ); // false
+          genre.active !== false ? 375 : 400,
+          '<i class="fas fa-edit"></i> Editar', // true
+          genre.active !== false
+            ? '<i class="fas fa-lock"></i> Bloquear'
+            : '<i class="fas fa-lock-open"></i> Desbloquear'
+        );
         if (result) {
           this.updateForm(html, genre);
         } else if (result === false) {
-          this.blockForm(genre);
+          this.unblockForm(genre, (genre.active !== false) ? false : true);
         }
         break;
       case 'block':
-        this.blockForm(genre);
+        this.unblockForm(genre, false);
         break;
+      case 'unblock':
+          this.unblockForm(genre, true);
+          break;
       default:
         break;
     }
   }
   private async addForm(html: string) {
-    const result = await formBasicDialog('Añadir Género', html, 'name');
+    const result = await formBasicDialog('Añadir género', html, 'name');
     this.addGenre(result);
   }
   private addGenre(result) {
     if (result.value) {
       this.service.add(result.value).subscribe((res: any) => {
-        console.log(res);
         if (res.status) {
           basicAlert(TYPE_ALERT.SUCCESS, res.message);
           return;
@@ -99,16 +109,15 @@ export class GenresComponent implements OnInit {
       });
     }
   }
+
   private async updateForm(html: string, genre: any) {
-    const result = await formBasicDialog('Modificar Género', html, 'name');
-    console.log(result);
+    const result = await formBasicDialog('Modificar género', html, 'name');
     this.updateGenre(genre.id, result);
   }
+
   private updateGenre(id: string, result) {
-    console.log(id, result.value);
     if (result.value) {
       this.service.update(id, result.value).subscribe((res: any) => {
-        console.log(res);
         if (res.status) {
           basicAlert(TYPE_ALERT.SUCCESS, res.message);
           return;
@@ -117,9 +126,9 @@ export class GenresComponent implements OnInit {
       });
     }
   }
-  private blockGenre(id: string) {
-    this.service.block(id).subscribe((res: any) => {
-      console.log(res);
+
+  private blockGenre(id: string, unblock: boolean) {
+    this.service.unblock(id, unblock).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
         return;
@@ -127,17 +136,26 @@ export class GenresComponent implements OnInit {
       basicAlert(TYPE_ALERT.WARNING, res.message);
     });
   }
-  private async blockForm(genre: any) {
-    const result = await optionsWithDetails(
-      '¿Seguro que quiere bloquear?',
-      `Si bloquea el item seleccionado, no se mostrará en la lista`,
-      430,
-      'No bloquear',
-      'Si Bloquear'
-    );
+
+  private async unblockForm(genre: any, unblock: boolean) {
+    const result = unblock
+      ? await optionsWithDetails(
+          '¿Desbloquear?',
+          `Si desbloqueas el género seleccionado, se mostrará en la lista y podrás hacer compras y ver toda la información`,
+          500,
+          'No, no desbloquear',
+          'Si, desbloquear'
+        )
+      : await optionsWithDetails(
+          '¿Bloquear?',
+          `Si bloqueas el género seleccionado, no se mostrará en la lista`,
+          430,
+          'No, no bloquear',
+          'Si, bloquear'
+        );
     if (result === false) {
-      // Si el resultado es falso se quiere bloquear
-      this.blockGenre(genre.id);
+      // Si resultado falso, queremos bloquear
+      this.blockGenre(genre.id, unblock);
     }
   }
 }

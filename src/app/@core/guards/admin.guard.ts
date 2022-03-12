@@ -6,7 +6,7 @@ import {
   Router,
 } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
-const jwtDecode = require ('jwt-decode');
+const jwtDecode = require('jwt-decode');
 @Injectable({
   providedIn: 'root',
 })
@@ -16,32 +16,30 @@ export class AdminGuard implements CanActivateChild {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    // comprobar que existe sesión
-    if (this.auth.getSession() !== null){
+    // Primero comprobar que existe sesión
+    if (this.auth.getSession() !== null) {
       console.log('Estamos logueados');
       const dataDecode = this.decodeToken();
-      console.log(dataDecode);
-      // Comprobar que no está caducado el token
-      if (dataDecode.exp < new Date().getTime() / 1000){
-        console.log('sesion caducada');
+      // COmprobar que no está caducado el token
+      if (dataDecode.exp < new Date().getTime() / 1000) {
+        console.log('Sesión caducada');
         return this.redirect();
       }
-      // Rol del usuario Admin
-      if (dataDecode.user.role === 'ADMIN'){
+      // El role del usuario es ADMIN
+      if (dataDecode.user.role === 'ADMIN') {
         console.log('Somos administradores');
         return true;
       }
-      console.log('No somos administradores');
+      console.log('NO somos administradores');
     }
-    console.log('sesion no iniciada');
+    console.log('Sesion no iniciada');
     return this.redirect();
   }
-
-  redirect(){
+  redirect() {
     this.router.navigate(['/login']);
     return false;
   }
- decodeToken(){
+  decodeToken() {
     return jwtDecode(this.auth.getSession().token);
   }
 }

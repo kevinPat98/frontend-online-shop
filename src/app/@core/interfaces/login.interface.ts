@@ -1,8 +1,10 @@
-import {IUser} from './user.interface';
+import { IUser } from './user.interface';
+
 export interface ILoginForm {
     email: string;
     password: string;
 }
+
 
 export interface IResultLogin {
     status: boolean;
@@ -10,3 +12,4 @@ export interface IResultLogin {
     token?: string;
     user?: IUser;
 }
+

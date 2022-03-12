@@ -1,5 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Output, EventEmitter, ComponentFactoryResolver } from '@angular/core';
 
 @Component({
   selector: 'app-date-picker-legal-age',
@@ -18,18 +18,17 @@ export class DatePickerLegalAgeComponent implements OnInit {
     day: this.CURRENTDAY.day
   };
   maxDate: NgbDateStruct = {
-      year: this.CURRENTDAY.year - 18,
-      month: this.CURRENTDAY.month,
-      day: this.CURRENTDAY.day
-    };
-    model: NgbDateStruct = this.maxDate;
+    year: this.CURRENTDAY.year - 18,
+    month: this.CURRENTDAY.month,
+    day: this.CURRENTDAY.day
+  };
+  model: NgbDateStruct = this.maxDate;
   @Output() newDate = new EventEmitter<NgbDateStruct>();
   constructor() { }
   ngOnInit(): void {
   }
 
-  selectDateChange(){
-    console.log(this.model);
+  selectDateChange() {
     this.newDate.emit(this.model);
   }
 

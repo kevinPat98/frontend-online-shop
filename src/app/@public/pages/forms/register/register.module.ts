@@ -6,7 +6,6 @@ import { RegisterRoutingModule } from './register-routing.module';
 import { RegisterComponent } from './register.component';
 import { DatePickerLegalAgeModule } from '@shared/calendar/date-picker-legal-age/date-picker-legal-age.module';
 
-
 @NgModule({
   declarations: [RegisterComponent],
   imports: [

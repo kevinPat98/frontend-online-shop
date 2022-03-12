@@ -4,8 +4,8 @@
     <div class="col-lg-6">
       <form (ngSubmit)="add()" #forma="ngForm">
         <h1>Activar usuario</h1>
-        <p>Introduzca la contraseña y posteriormente verificarla; Selecciona la fecha de nacimiento.</p>
-        <label for="email"><b>Fecha de Nacimiento</b></label>
+        <p>Introduzca el password y verificalo antes de activar el usuario. Selecciona tu fecha de nacimiento.</p>
+        <label for="email"><b>Fecha de nacimiento</b></label>
         <app-date-picker-legal-age
           (newDate)="dataAsign($event)"
         ></app-date-picker-legal-age>
@@ -58,7 +58,7 @@
         <div class="row">
           <div class="col-lg">
             <button type="submit" [disabled]="!forma.valid" class="signup-btn">
-              Activar Usuario
+              Activar usuario
             </button>
           </div>
         </div>

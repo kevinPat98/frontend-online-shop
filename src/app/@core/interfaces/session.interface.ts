@@ -1,11 +1,10 @@
 import { IUser } from './user.interface';
-
-export interface ISession{
+export interface ISession {
     expiresIn: string;
     token?: string;
 }
 
-export interface IMeData{
+export interface IMeData {
     status: boolean;
     message?: string;
     user?: IUser;

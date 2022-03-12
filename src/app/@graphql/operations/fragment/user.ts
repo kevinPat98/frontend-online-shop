@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const USER_FRAGMENT = gql`
-fragment UserObject on User{
+  fragment UserObject on User {
     id
     name
     lastname
@@ -10,5 +10,5 @@ fragment UserObject on User{
     birthday @include(if: $include)
     role
     active
-}
+  }
 `;

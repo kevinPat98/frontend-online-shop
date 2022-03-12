@@ -13,7 +13,7 @@
           <label for="email"><b>Correo electrónico</b></label>
           <input
             type="email"
-            #email="ngModel"
+            #email="ngModel" 
             [(ngModel)]="login.email"
             placeholder="Introduzca la correo electrónico"
             name="email"
@@ -23,9 +23,11 @@
             pattern="^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
           />
           <div class="alert alert-danger" *ngIf="email.invalid && (email.dirty || email.touched)">
-            <div *ngIf="email.errors.required">Introduzca un correo válido por favor</div>
-            <div *ngIf="email.errors && email.errors.pattern">El correo electrónico no sigue el formato correcto. Ejemplo:
-              nombre@gmail.com
+            <div *ngIf="email.errors.required">
+              Introduzca un correo electrónico válido por favor
+            </div>
+            <div *ngIf="email.errors && email.errors.pattern">
+              El correo electrónico no sigue el formato correcto. Sigue este ejemplo: anartz@mugika.com
             </div>
           </div>
 
@@ -41,7 +43,9 @@
             required
           />
           <div class="alert alert-danger" *ngIf="password.invalid && (password.dirty || password.touched)">
-            <div *ngIf="password.errors.required">Introduzca una contraseña por favor</div>
+            <div *ngIf="password.errors.required">
+              Introduzca una contraseña por favor
+            </div>
           </div>
 
           <div class="row">

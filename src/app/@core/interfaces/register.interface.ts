@@ -1,6 +1,6 @@
 import { IUser } from './user.interface';
 
-export interface IRegisterForm{
+export interface IRegisterForm {
     name: string;
     lastname: string;
     email: string;
@@ -15,3 +15,4 @@ export interface IResultRegister {
     message: string;
     user?: IUser;
 }
+

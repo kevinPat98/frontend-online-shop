@@ -1,20 +1,21 @@
-*{
-    color: rgba(255,255,255, .80)
+* {
+    color: rgba(255,255,255, 0.8);
 }
 
-.logotype{
+.logotype {
     width: 25%;
     text-align: left;
     margin: 5px 0 5px 10px;
 }
 
-p,a{
+p, a {
     position: relative;
 }
 
-p{
+p {
     top: 25%;
 }
-a{
-    top: 14%
+
+a {
+    top: 14%;
 }

@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const RESET_PASSWORD = gql`
-  mutation resetarPassword($email: String!) {
+  mutation resetearPassword($email: String!) {
     resetPassword(email: $email) {
       status
       message
@@ -10,11 +10,10 @@ export const RESET_PASSWORD = gql`
 `;
 
 export const CHANGE_PASSWORD = gql`
-  mutation cambio($id: ID!, $password: String!){
-    changePassword(id: $id, password: $password){
+  mutation cambio($id: ID!, $password: String!) {
+    changePassword(id: $id, password: $password) {
       status
       message
     }
   }
 `;
-

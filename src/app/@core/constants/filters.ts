@@ -1,5 +1,5 @@
 export enum ACTIVE_FILTERS {
-    ALL = 'ALL',
-    INACTIVE = 'INACTIVE',
-    ACTIVE = 'ACTIVE'
+  ALL = 'ALL',
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE',
 }

@@ -9,7 +9,6 @@ const swalWithBasicOptions = (title: string, html: string) =>
     cancelButtonText: 'Cancelar',
     showCancelButton: true,
   });
-
 export async function formBasicDialog(
   title: string,
   html: string,
@@ -22,52 +21,50 @@ export async function formBasicDialog(
         return value;
       }
       Swal.showValidationMessage(
-        'Se tiene que añadir un genero para poder almacenarlo'
+        'Tienes que añadir un género para poder almacenarlo'
       );
       return;
     },
   });
 }
 
-export async function userformBasicDialog(
-  title: string,
-  html: string
-) {
+export async function userFormBasicDialog(title: string, html: string) {
   return await swalWithBasicOptions(title, html).fire({
     preConfirm: () => {
       let error = '';
       const name = (document.getElementById('name') as HTMLInputElement).value;
       if (!name) {
-        error += 'El nombre del usuario es obligatorio<br/>';
+        error += 'Usuario es obligatorio<br/>';
       }
-      const lastname = (document.getElementById('lastname') as HTMLInputElement).value;
+      const lastname = (document.getElementById('lastname') as HTMLInputElement)
+        .value;
       if (!lastname) {
-        error += 'El apellido del usuario es obligatorio<br/>';
+        error += 'Apellido es obligatorio<br/>';
       }
-      const email = (document.getElementById('email') as HTMLInputElement).value;
+      const email = (document.getElementById('email') as HTMLInputElement)
+        .value;
       if (!email) {
-        error += 'El email del usuario es obligatorio<br/>';
+        error += 'Email es obligatorio<br/>';
       }
       if (!EMAIL_PATTERN.test(email)) {
-        error += 'Email no correcto, Introduzca un email con el formato adecuado por favor. Pj: nombre@gmail.com ';
+        error += 'Email no es correcto en su formato';
       }
       const role = (document.getElementById('role') as HTMLInputElement).value;
-      if (error !== ''){
-        Swal.showValidationMessage(
-          error
-        );
+      if (error !== '') {
+        Swal.showValidationMessage(error);
         return;
       }
-      return{
+      return {
         name,
         lastname,
         email,
         role,
-        birthday: new Date().toISOString()
+        birthday: new Date().toISOString(),
       };
     },
   });
 }
+
 export async function optionsWithDetails(
   title: string,
   html: string,
@@ -86,7 +83,6 @@ export async function optionsWithDetails(
     confirmButtonText,
     cancelButtonText,
   }).then((result) => {
-    console.log(result);
     if (result.value) {
       console.log('Editar');
       return true;
@@ -96,3 +92,18 @@ export async function optionsWithDetails(
     }
   });
 }
+
+
+export const loadData = (title: string, html: string) => {
+  Swal.fire({
+    title,
+    html,
+    onBeforeOpen: () => {
+      Swal.showLoading();
+    },
+  });
+};
+
+export const closeAlert = () => {
+  Swal.close();
+};

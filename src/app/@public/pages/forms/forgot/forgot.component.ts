@@ -17,7 +17,7 @@ export class ForgotComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  reset(){
+  reset() {
     this.passwordService.reset(this.emailValue).subscribe( result => {
       if (result.status) {
         basicAlert(TYPE_ALERT.SUCCESS, result.message);

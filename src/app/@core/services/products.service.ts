@@ -1,10 +1,11 @@
 import { map } from 'rxjs/internal/operators/map';
-import { ACTIVE_FILTERS } from '@core/constants/filters';
-import { Apollo } from 'apollo-angular';
-import { ApiService } from '@graphql/services/api.service';
 import { Injectable } from '@angular/core';
+import { ApiService } from '@graphql/services/api.service';
+import { Apollo } from 'apollo-angular';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 import { SHOP_LAST_UNITS_OFFERS, SHOP_PRODUCT_BY_PLATFORM } from '@graphql/operations/query/shop-product';
 import { IProduct } from '@mugan86/ng-shop-ui/lib/interfaces/product.interface';
+import { HOME_PAGE } from '@graphql/operations/query/home-page';
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +16,30 @@ export class ProductsService extends ApiService{
     super(apollo);
   }
 
+  getHomePage() {
+    return this.get(
+      HOME_PAGE,
+      {
+        showPlatform: true
+      }
+    ).pipe(map((result: any) => {
+      return {
+        carousel: result.carousel,
+        ps4: this.manageInfo(result.ps4.shopProducts, false),
+        pc: this.manageInfo(result.pc.shopProducts, false),
+        topPrice: this.manageInfo(result.topPrice35.shopProducts, true)
+      };
+    }));
+  }
+
   getByPlatform(
     page: number = 1,
     itemsPage: number = 10,
     active: ACTIVE_FILTERS = ACTIVE_FILTERS.ACTIVE,
     random: boolean = false,
-    platform: string
+    platform: Array<string> = ['-1'],
+    showInfo: boolean = false,
+    showPlatform: boolean = false,
   ){
     return this.get(
       SHOP_PRODUCT_BY_PLATFORM,
@@ -29,10 +48,16 @@ export class ProductsService extends ApiService{
         itemsPage,
         active,
         random,
-        platform
+        platform,
+        showInfo,
+        showPlatform
       }
     ).pipe(map((result: any) => {
-      return this.manageInfo(result.shopProductsPlatforms.shopProducts);
+      const data = result.shopProductsPlatforms;
+      return {
+        info: data.info,
+        result: this.manageInfo(data.shopProducts)
+      };
     }));
   }
 
@@ -42,7 +67,9 @@ export class ProductsService extends ApiService{
     active: ACTIVE_FILTERS = ACTIVE_FILTERS.ACTIVE,
     random: boolean = false,
     topPrice: number = -1,
-    lastUnits: number = -1
+    lastUnits: number = -1,
+    showInfo: boolean = false,
+    showPlatform: boolean = false
   ){
     return this.get(
       SHOP_LAST_UNITS_OFFERS,
@@ -52,27 +79,33 @@ export class ProductsService extends ApiService{
         active,
         random,
         topPrice,
-        lastUnits
+        lastUnits,
+        showInfo,
+        showPlatform
       }
     ).pipe(map((result: any) => {
-      return this.manageInfo(result.shopProductsOffersLast.shopProducts);
+      const data = result.shopProductsOffersLast;
+      return {
+        info: data.info,
+        result: this.manageInfo(data.shopProducts)
+      };
     }));
   }
 
-  private manageInfo(listProducts) {
-    const resultList: Array<IProduct> = [];
-    listProducts.map((shopObject) => {
-      resultList.push({
-        id: shopObject.id,
-        img: shopObject.product.img,
-        name: shopObject.product.name,
-        rating: shopObject.product.rating,
-        description: '',
-        qty: 1,
-        price: shopObject.price,
-        stock: shopObject.stock
+  private manageInfo(listProducts: any, showDescription = true) {
+      const resultList: Array<IProduct> = [];
+      listProducts.map((shopObject) => {
+        resultList.push({
+          id: shopObject.id,
+          img: shopObject.product.img,
+          name: shopObject.product.name,
+          rating: shopObject.product.rating,
+          description: (shopObject.platform && showDescription) ? shopObject.platform.name : '',
+          qty: 1,
+          price: shopObject.price,
+          stock: shopObject.stock
+        });
       });
-    });
-    return resultList;
-}
+      return resultList;
+  }
 }
