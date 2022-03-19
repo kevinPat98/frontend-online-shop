@@ -25,8 +25,8 @@ export class LoginComponent {
             this.auth.setSession(result.token);
             this.auth.updateSession(result);
             if (localStorage.getItem('route_after_login')) {
-              this.router.navigate([localStorage.getItem('route_after_login')]);
-              localStorage.removeItem('route_after_login');
+              const route = [localStorage.getItem('route_after_login')];
+              this.router.navigate(route);
               return;
             }
             this.router.navigate(['/home']);

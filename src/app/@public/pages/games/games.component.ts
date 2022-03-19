@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IGamePageInfo } from './games-page-info.interface';
 import { GAMES_PAGES_INFO, TYPE_OPERATION } from './game.constants';
 import { loadData, closeAlert } from '@shared/alerts/alerts';
+
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
