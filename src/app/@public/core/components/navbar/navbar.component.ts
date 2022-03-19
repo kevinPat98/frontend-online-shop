@@ -1,3 +1,4 @@
+import { optionsWithDetails } from '@shared/alerts/alerts';
 import { ICart } from '@shop/core/components/shopping-cart/shoppin-cart.interface';
 import { IMenuItem } from '@core/interfaces/menu-item.interface';
 import { Component, OnInit } from '@angular/core';
@@ -46,13 +47,8 @@ export class NavbarComponent implements OnInit {
     this.cartService.open();
   }
 
-  logout() {
-    // rutas que usaremos para redireccionar
-    if (REDIRECTS_ROUTES.includes(this.router.url)) {
-      // En el caso de encontrarla marcamos para que redireccione
-      localStorage.setItem('route_after_login', this.router.url);
-    }
-    this.authService.resetSession();
+  async logout() {
+    this.authService.resetSession(this.router.url);
   }
 
 }

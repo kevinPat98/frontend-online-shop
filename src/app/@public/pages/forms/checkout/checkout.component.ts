@@ -87,7 +87,7 @@ export class CheckoutComponent implements OnInit {
           this.block = true;
           loadData(
             'Realizando el pago',
-            'Espera mienytras se procesa la información de pago'
+            'Espera mientras se procesa la información de pago'
           );
           // Enviar la información y procesar el pago
           this.chargeService
@@ -104,7 +104,7 @@ export class CheckoutComponent implements OnInit {
                   console.log(result.charge);
                   await infoEventAlert(
                     'Pedido realizado correctamente',
-                    'Has efectuado correctamente el pedido. ¡¡Muchas gracias!!',
+                    'Has efectuado correctamente el pedido. ¡¡Muchas gracias por comprar en Juegos Boyacá!!',
                     TYPE_ALERT.SUCCESS
                   );
                   this.sendEmail(result.charge);
